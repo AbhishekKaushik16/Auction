@@ -1,0 +1,77 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+    <h1>{{listings.item_name}}</h1><br>
+    <h3><strong>Description:</strong> {{listings.description}}</h3><br>
+    <h4>Price: ${{listings.item_price}}</h4>
+    <br>
+    <div class="message">
+        
+        {% if message %}
+            <p>{{message}}</p>
+        {% endif %}
+    </div>
+    
+    <div>
+        <p>Max Bid is place by: {{max_bid.person_name}}</p>
+    </div>
+    
+    {% if listings.listed_by != user.username %}
+        
+    <div class="biding">
+        <form action="{% url 'listings' listings.id_no %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <input autofocus class="form-control" min = "{{max_bid.amount}}" type="number" name="bid_value" placeholder="Place Your Bid">
+            </div>
+            <input class="btn btn-primary" name="place-bid" type="submit" value="Place Bid">
+        </form>
+    </div>
+    {% endif %}
+    <br>
+
+    <div class="watchlist">
+        
+        {% if listings.watchlist %}
+        <a href="{% url 'alter-watchlist' listings.id_no %}" class="btn btn-primary btn-md my-0 p">
+            Remove from watchlist
+            <i class="fas fa-shopping-cart ml-1"></i>
+        </a>
+        {% else %}
+        <a href="{% url 'alter-watchlist' listings.id_no %}" class="btn btn-primary btn-md my-0 p">
+            Add to Watchlist
+            <i class="fas fa-shopping-cart ml-1"></i>
+        </a>
+        {% endif %}
+    </div>
+
+    <h4>Details</h4>
+    <ul>
+        <li>Listed By: {{listings.listed_by}}</li>
+        <li>Category: {{listings.category}}</li>
+    </ul>
+
+    <div class="comment">
+        <form action="{% url 'listings' listings.id_no %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <textarea autofocus class="form-control"  name="comment" placeholder="Type your comment"></textarea>
+            </div>
+            <input class="btn btn-primary" name="post-comment" type="submit" value="Post">
+        </form>
+    </div>
+    <div class="comments">
+        {% for comment in comments %}
+            <div class="comment">
+                <p class="info">
+                Comment {{ forloop.counter }} by {{ comment.name }}
+                {{ comment.created }}
+                </p>
+                {{ comment.body|linebreaks }}
+            </div>
+            {% empty %}
+            <p>There are no comments yet.</p>
+        {% endfor %}
+
+    </div>
+{% endblock %}
